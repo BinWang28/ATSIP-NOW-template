@@ -1,0 +1,111 @@
+%% $UFDate: 2015-06-08 11:40:27 +0200 -- Commit: 610cce7 (HEAD, origin/master, master, jmbbib) -- master$
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{now-sip-biblatex}
+          [2022/02/03 v1.0 biblatex styling for sip-journal]
+%18.04.2015: moved biblatex in the sty
+%08.06.2015: added code to change the citation format.
+
+\RequirePackage[backend=\nowbiblatexbackend,style=numeric,
+                natbib=true,uniquename=init,maxcitenames=2,dateabbrev=false]{biblatex}
+
+
+\ExecuteBibliographyOptions{maxbibnames=99}
+\ExecuteBibliographyOptions[proceedings]{useeditor=false}
+
+\DefineBibliographyStrings{english}{%
+  urlseen = {accessed on},
+  byeditor= {ed\adddot},
+}
+
+\renewcommand\newunitpunct {\addcomma\addspace}
+\renewcommand\bibpagespunct{\addcomma\addspace}
+\renewcommand\intitlepunct {\addspace}
+\bibitemsep\parskip
+
+\DeclareFieldFormat{series}{\mkbibemph{#1}}% publication series
+\DeclareFieldFormat[misc,report]{title}{\mkbibquote{#1\isdot}}
+\DeclareFieldFormat{type}{\ifbibstring{#1}{\mkbibemph{\bibstring{#1}}}{\mkbibemph{#1}}}
+\DeclareFieldFormat{volume}{\bibcpstring{volume}~#1}
+\DeclareFieldFormat{number}{No\adddot~#1}% number in a series
+\DeclareFieldFormat{url}{\url{#1}}
+\urlstyle{same}
+\DeclareFieldFormat{monthparens}{\mkbibparens{\mkbibmonth{#1}}}
+\DeclareFieldFormat{pages}{\mkcomprange{#1}}
+
+%dot after series:
+\renewbibmacro*{series+number}{%
+  \printfield{series}%
+  \setunit*{\adddot\addspace}%
+  \printfield{number}%
+  \newunit}
+
+\renewbibmacro*{name:andothers}{%
+  \ifboolexpr{
+    test {\ifnumequal{\value{listcount}}{\value{liststop}}}
+    and
+    test \ifmorenames
+  }
+    {\ifnumgreater{\value{liststop}}{1}
+       {\finalandcomma}
+       {}%
+     \andothersdelim\bibstring[\emph]{andothers}}
+    {}}
+
+
+% article:
+% no in:
+\renewbibmacro*{in:}{%
+  \ifentrytype{article}{}{%
+  \printtext{%
+    \bibstring{in}\intitlepunct}}}
+
+
+\renewbibmacro*{journal+issuetitle}{%
+  \usebibmacro{journal}%
+  \newunit
+  \iffieldundef{series}
+    {}
+    {\newunit
+     \printfield{series}%
+     \setunit{\addspace}}%
+  \usebibmacro{volume+number+eid}%
+  \setunit{\bibpagespunct} %comma statt colon
+  \printfield{pages}
+  \newunit}
+
+
+% volume + number or issue or month. No dot before number:
+\renewbibmacro*{volume+number+eid}{%
+  \printfield{volume}%
+  \iffieldundef{number}
+   {\iffieldundef{issue}
+     {\iffieldundef{month}
+      {}
+      {\iffieldundef{volume}
+       {\printfield[month]{month}}
+       {\addspace\bibsentence\printfield[monthparens]{month}}}}%
+     {\printfield[parens]{issue}}%
+   }
+   {\printfield[parens]{number}}%
+   \setunit{\addcomma\space}%
+   \printfield{eid}}
+
+\renewbibmacro*{note+pages}{%
+  \printfield{note}%
+  \newunit}
+
+
+\newcommand\breakbibliographyafter[1]{%%
+  \ifcsname raggedend\endcsname \raggedend\fi
+  \renewbibmacro{finentry}{%
+   \iffieldequalstr{entrykey}{#1}%<- key after which you want the break
+    {\finentry\pagebreak}
+    {\finentry}}}
+
+%08.06.2015
+%space between year and author
+\renewcommand*{\nameyeardelim}{\addspace}
+%compress
+\DeclareFieldFormat{postnote}{\mkcomprange{#1}}
+
+\endinput
