@@ -1,11 +1,11 @@
 # ATSIP-NOW-template
 
-### Update: Mar. 22, 2023
+### Last Update: Mar. 22, 2023
 
 This is the template for APSIPA-TSIP journal with NOW publisher.
 
 
 
-Contributor: 
+### Contributors: 
 - Chengwei Wei
 - Bin Wang
